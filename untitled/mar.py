@@ -26,7 +26,6 @@ def main():
     hero=Player(55,55)# створюєм героя(х,y)
     left=right=False# стоїмо якшо нічого не робимо
     up=False
-    timer = pygame.time.Clock()
     entities = pygame.sprite.Group()
     platforms = []
     entities.add(hero)
@@ -52,42 +51,45 @@ def main():
        "-                       -",
        "-------------------------"] #рівеень
 
-
-
-
-    while 1: #основний цикл програми
-        timer.tick(20)
-        for i in pygame.event.get():
-            if i.type==QUIT:
-                raise SystemExit,"QUIT"
-
-        x=y=0 #координати
-        for row in level: #весь рядок
+    timer = pygame.time.Clock()
+    x=y=0 #координати
+    for row in level: #весь рядок
             for col in row:# кожен символ
                 if col == "-":
                     pf = Platform(x,y)
                     entities.add(pf)
                     platforms.append(pf)
-                    if i.type == KEYDOWN and i.key == K_LEFT:
-                        left = True
-                    if i.type == KEYDOWN and i.key == K_RIGHT:
-                        right = True
-
-                    if i.type == KEYUP and i.key == K_RIGHT:
-                        right = False
-                    if i.type == KEYUP and i.key == K_LEFT:
-                        left = False
-
-                    if i.type == KEYDOWN and i.type == K_UP:
-                        up = True
-                    if i.type == KEYUP and i.type == K_UP:
-                        up = False
                 x=x+PLATFORM_WIDTH# блоки платформи ставляться на ширині блоків
             y=y+PLATFORM_HEIGHT# то саме і з висотою
-            screen.blit(bg,(0,0)) #кожну ітерацію треба все перремальовувати
-            hero.update(left, right, up,platforms)# рух
-            entities.draw(screen) #відображеня
             x=0 #на кожному рядку починаєм з нуля
+
+
+
+    while 1: #основний цикл програми
+        timer.tick(60)
+        for i in pygame.event.get():
+            if i.type==QUIT:
+                raise SystemExit,"QUIT"
+
+            if i.type == KEYDOWN and i.key == K_UP:
+                up = True
+            if i.type == KEYDOWN and i.key == K_LEFT:
+                left = True
+            if i.type == KEYDOWN and i.key == K_RIGHT:
+                right = True
+
+            if i.type == KEYUP and i.key == K_UP:
+                up = False
+            if i.type == KEYUP and i.key == K_RIGHT:
+                right = False
+            if i.type == KEYUP and i.key == K_LEFT:
+                left = False
+
+
+        screen.blit(bg,(0,0)) #кожну ітерацію треба все перремальовувати
+        hero.update(left, right, up,platforms)# рух
+        entities.draw(screen) #відображеня
+
 
 
 
