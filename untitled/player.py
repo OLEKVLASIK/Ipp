@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 from pygame import *
 import pyganim
 import os
+import blocks
+import monster
+import sys
+
 
 
 MOVE_SPEED=7
@@ -14,6 +19,7 @@ JUMP_POWER = 10
 GRAVITY = 0.35
 ANIMATION_DELAY = 0.1#zmiana animacji
 ICON_DIR = os.path.dirname(__file__)
+
 
 ANIMATION_RIGHT = [('%s/postac/12.png' % ICON_DIR),
             ('%s/postac/13.png' % ICON_DIR),
@@ -127,6 +133,14 @@ class Player(sprite.Sprite):
     def collide(self, xvel, yvel, platforms):
         for p in platforms:
             if sprite.collide_rect(self, p):
+                if isinstance(p, blocks.BlockDie)or isinstance(p, monster.Monster):
+                    self.die()
+                elif isinstance(p,blocks.BlockTeleport):
+                    self.teleporting(p.goX,p.goY)
+                elif isinstance(p, blocks.Princess):  # якшо торкнувся принцеси виграв
+                    print "wygrales"
+                    sys.exit()
+
                 if xvel > 0:
                     self.rect.right=p.rect.left
                 if xvel < 0:
@@ -139,5 +153,13 @@ class Player(sprite.Sprite):
                     self.rect.top=p.rect.bottom
                     self.yvel=0
 
+
+    def die(self):
+        time.wait(500)
+        self.teleporting(self.startX, self.startY)# przemieszczamy w poczatkowe miejsce
+
+    def teleporting(self, goX, goY):
+        self.rect.x=goX
+        self.rect.y=goY
 
 

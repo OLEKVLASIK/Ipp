@@ -6,6 +6,7 @@ import pygame
 from pygame import *
 from player import *
 from blocks import *
+from monster import *
 
 
 # Объявляем переменные
@@ -73,7 +74,8 @@ def button2(msg2,x,y,w,h,ic,ac,action= None):
 
 def menu():
     intro = True
-
+    pygame.mixer.music.load("awesomeness.wav")
+    pygame.mixer.music.play(-1)
     while intro:
         for event in pygame.event.get():
             print(event)
@@ -128,41 +130,93 @@ def main():
     bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности
     # будем использовать как фон
     bg.fill(Color(BACKGROUND_COLOR))  # Заливаем поверхность сплошным цветом
+    pygame.mixer.music.load("Caketown 1.mp3")
+    pygame.mixer.music.play(-1)
+
 
     hero = Player(55, 55)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию - стоим
     up = False
-
-    entities = pygame.sprite.Group()  # Все объекты
-    platforms = []  # то, во что мы будем врезаться или опираться
-
+    mn3 = Monster(900, 565, 2, 3, 80, 10)
+    mn4 = Monster(1600, 276, 2, 3, 100, 10)
+    mn5 = Monster(2500, 465, 2, 3, 100, 10)
+    mn6 = Monster(2900, 465, 2, 3, 100, 10)
+    mn7 = Monster(4050, 565, 2, 3, 100, 10)
+    entities = pygame.sprite.Group()  # всі обєкти
+    monsters = pygame.sprite.Group()  # всі обєкти які рухаються
+    animatedEntities = pygame.sprite.Group()
+    platforms = []  # в то що вони будуть вдарятися або опиратися
     entities.add(hero)
+    # твореня монстрів
+
+    entities.add(mn3)
+    platforms.append(mn3)
+    monsters.add(mn3)
+
+    entities.add(mn4)
+    platforms.append(mn4)
+    monsters.add(mn4)
+
+    entities.add(mn5)
+    platforms.append(mn5)
+    monsters.add(mn5)
+
+    entities.add(mn6)
+    platforms.append(mn6)
+    monsters.add(mn6)
+
+    entities.add(mn7)
+    platforms.append(mn7)
+    monsters.add(mn7)
+
+    # твореня порталів
+    tp = BlockTeleport(324,122, 680, 1000)
+    entities.add(tp)
+    platforms.append(tp)
+    animatedEntities.add(tp)
+
+
+    tp1 = BlockTeleport(900, 122, 1300,1000)
+    entities.add(tp1)
+    platforms.append(tp1)
+    animatedEntities.add(tp1)
+
+    tp2 = BlockTeleport(1700, 142, 2280, 1000)
+    entities.add(tp2)
+    platforms.append(tp2)
+    animatedEntities.add(tp2)
+
+    tp3 = BlockTeleport(3400, 490, 3780, 1000)
+    entities.add(tp3)
+    platforms.append(tp3)
+    animatedEntities.add(tp3)
+
+    tp4 = BlockTeleport(4200, 490, 4480, 1000)
+    entities.add(tp4)
+    platforms.append(tp4)
+    animatedEntities.add(tp4)
 
     level = [
-        "----------------------------------",
-        "-                                -",
-        "-                       --       -",
-        "-                                -",
-        "-            --                  -",
-        "-                                -",
-        "--                               -",
-        "-                                -",
-        "-                   ----     --- -",
-        "-                                -",
-        "--                               -",
-        "-                                -",
-        "-                            --- -",
-        "-                                -",
-        "-                                -",
-        "-      ---                       -",
-        "-                                -",
-        "-   -------         ----         -",
-        "-                                -",
-        "-                         -      -",
-        "-                            --  -",
-        "-                                -",
-        "-                                -",
-        "----------------------------------"]
+        "---------------------------------------------------------------------------------------------------------------------------------------------------",
+        "-   -               -                  -                            -                                         *-                                  -",
+        "-   -               -                  -                            -                                         *-                                  -",
+        "-   -               -                  -     -------------------    -                                         *-                                  -",
+        "-   -               -                  -     -                      -               -----------------         *-                                  -",
+        "-   -               -                  -  -  -                      -                               -         *-                                  -",
+        "-   -               *                  -     -                      -                               -       * *-                                  -",
+        "-   -               *                  -     -                      ---------                       -         *-                                  -",
+        "-   -               *                  -    --                      -                               -         *-                                  -",
+        "-   -     --        -                  -     -                      -        *                      -         *-                                  -",
+        "-   -               -    ---           -     ---------              -              -                -         *-**********************************-",
+        "-   -               -                  -     -                      -                               -   *     *-                        *         -",
+        "-   -            -- -  **              - -   *                      -                *              -         *-                        *         -",
+        "-                   -                  -     *                      -                         -     -         *-                        *         -",
+        "-            --     -               *  -     *        * --          -                               -         *-                        *        &-",
+        "-             *     -          ---     *                            -                               - *       *-                        *        --",
+        "-       ---   *     -                  *   ----                  ----  ------------------------------         *-                        *      ----",
+        "-   *         *     -                  *                            -                               -         *-                        *     -  --",
+        "-   *         *     -   *              *****************************-**************************************** *-                        *    -   --",
+        "---------------------------------------------------------------------------------------------------------------------------------------------------"]
 
     timer = pygame.time.Clock()
     x = y = 0  # координаты
@@ -172,6 +226,15 @@ def main():
                 pf = Platform(x, y)
                 entities.add(pf)
                 platforms.append(pf)
+            if col == "*":
+                bd = BlockDie(x,y)
+                entities.add(bd)
+                platforms.append(bd)
+            if col == "&":
+                pr = Princess(x, y)
+                entities.add(pr)
+                platforms.append(pr)
+
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -202,7 +265,8 @@ def main():
                 left = False
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
-
+        monsters.update(platforms)  # рух монстрів
+        animatedEntities.update()
         camera.update(hero)  # центризируем камеру относительно персонажа
         hero.update(left, right, up, platforms)  # передвижение
         # entities.draw(screen) # отображение
